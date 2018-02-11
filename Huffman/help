@@ -1,0 +1,5 @@
+Usage: ZIP [OPTION]... [FILE]...
+Compress a text file using Huffman encoding.
+
+  --t              Display the Huffman encoding table. 
+  --help           Provide help on command. 

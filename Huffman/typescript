@@ -1,0 +1,348 @@
+Script started on Fri 10 Nov 2017 03:47:32 AM EST
+]0;lee_c@cobra:~/csc245/Project3[?1034h[lee_c@cobra Project3]$ cat -n zip.cpp 
+     1	#include "huffman.h"
+     2	#include <iostream>
+     3	#include <fstream>
+     4	#include <vector>
+     5	#include <string>
+     6	#include <sstream>
+     7	#include <cstdlib>
+     8	
+     9	using namespace std;
+    10	
+    11	void compress(string directory, HuffmanTree &tree);
+    12	void writeFile(string directory, HuffmanTree tree, string encodedString);
+    13	
+    14	int main(int argc, char* argv[]) {
+    15		HuffmanTree tree;
+    16	
+    17		// Terminates the program if incorrect arguments are used
+    18		if(argc == 1) {
+    19			cout << "Missing target file." << endl;
+    20			exit(1);
+    21		}
+    22		else if(argc == 2) {
+    23			string tmp = argv[1];
+    24			if(tmp == "--help") {
+    25				cout << "Usage: ZIP [FILE]... [OPTION]" << endl;
+    26				cout << "Compress a text file using Huffman encoding." << endl;
+    27				cout << "--t: Display the Huffman encoding table." << endl;
+    28				cout << "--help: Provide help on command." << endl;
+    29			}
+    30			else {
+    31				// Encodes the file, then writes to a file
+    32				string directory = argv[1];
+    33				compress(directory, tree);
+    34			}
+    35		}
+    36		else if(argc == 3) {
+    37			string tmp = argv[2];
+    38			if(tmp == "--t") {
+    39				// Encodes the file, then prints encoding table
+    40				string directory = argv[1];
+    41				compress(directory, tree);
+    42				tree.PrintTable();
+    43			}
+    44			else {
+    45				cout << "Invalid arguements!" << endl;
+    46				exit(1);
+    47			}
+    48		}
+    49		else {
+    50			cout << "Invalid arguements!" << endl;
+    51			exit(1);
+    52		}
+    53		
+    54		return 0;
+    55	}
+    56	
+    57	// reads in the contents of the .zip file and saves it as a vector
+    58	void compress(string directory, HuffmanTree &tree) {
+    59		ostringstream s;
+    60		int sourceSize = 0;
+    61		char curr;
+    62		int characters[256];
+    63		for(char ch = char(0); ch <= char(126); ch++)
+    64			characters[ch] = 0;
+    65		ifstream target ( directory.c_str() );
+    66		// Counts how many times each character occurs to find the weight
+    67		target.get(curr);
+    68		while( target ) {
+    69			s << curr;
+    70			characters[curr] += 1;	
+    71			sourceSize += 1;
+    72			target.get(curr);
+    73		}
+    74		target.close();
+    75		string ref(s.str());
+    76	
+    77		// Adds each char and their weight to the Huffman Tree
+    78		for(char ch = char(0); ch <= char(126); ch++) {
+    79			if(characters[ch] != 0)
+    80				tree.insert(ch, characters[ch]);
+    81		}
+    82		tree.build();
+    83	
+    84		ostringstream d;
+    85		for(int i = 0; i < ref.size(); i++) {
+    86			d << tree.GetCode(ref[i]);
+    87		}
+    88		string encodedString(d.str());
+    89	
+    90		writeFile(directory, tree, encodedString);
+    91	
+    92		// Prints out the compression rate of the file in zip form
+    93		double ratio = ( 1.0 - ( ( encodedString.size() + 0.0 ) /
+    94					( (sourceSize * 8) + 0.0 ) ) ) * 100 ;
+    95		cout << "File sucessfully compressed to " << encodedString.size()
+    96			<< " bits (" << ratio << "\% Less)" << endl;
+    97	}
+    98	
+    99	void writeFile(string directory, HuffmanTree tree,string encodedString) {	
+   100		// removes the uncompressed file
+   101		remove(directory.c_str());
+   102	
+   103		// writes the encoded file to a zip file
+   104		directory += ".zip";
+   105		ofstream outFile ( directory.c_str() );
+   106		if( outFile.is_open() ) {
+   107			outFile << tree.getHeader();
+   108			outFile << encodedString;
+   109		}
+   110		outFile.close();
+   111	}
+]0;lee_c@cobra:~/csc245/Project3[lee_c@cobra Project3]$ cat huffman.h
+#include <vector>
+#include <string>
+using namespace std;
+
+struct HNode {
+    char ch;
+    int weight;
+    int parent;
+    int childType;
+};
+
+class HuffmanTree {
+    public:
+	HuffmanTree();				// constructor
+
+	void insert(char ch, int weight);	// inserts a character and its associated weight
+						// into a node of the Huffman tree
+
+	bool inTree(char ch);			// returns a boolean value indicating whether
+						// a given character is stored in the tree
+		
+	int GetFrequency(char ch);		// returns the weight of a given character
+
+	
+	void build();				// Builds the Huffman Tree;
+	
+
+	string GetCode(char ch);		// returns the compressed code of a given
+						// character in the tree using recursion
+
+	void PrintTable();			// displays the Huffman encoding table used in
+						// the compression process
+	
+	int numNodes();				// returns the number of nodes currently in Huffman 
+						// tree
+	
+	string getHeader();
+
+
+    private:
+	vector<HNode> nodes;
+	int numChars;
+	bool built;                             
+	
+	int lookUp(char ch);			// returns the index of a given character in tree
+	int GetFrequency(int i);		// returns the weight at a given index
+	string GetCode(int i);			// returns the compressed code of the character at 
+						// a given index
+};
+]0;lee_c@cobra:~/csc245/Project3[lee_c@cobra Project3]$ cat huffman.cpp 
+#include <iostream>
+#include <climits>
+#include <sstream>
+#include "huffman.h"
+
+using namespace std;
+
+HuffmanTree:: HuffmanTree()
+: numChars(0), built(false) {}
+
+int characters[256];
+
+void HuffmanTree:: insert(char ch, int weight) {
+	HNode newNode = {ch, weight, -1, -1}; 
+	built = false;
+	nodes.push_back(newNode);
+	numChars++;
+
+}
+
+bool HuffmanTree:: inTree(char ch) {
+	if(lookUp(ch) == -1)
+		return false;
+	else
+		return true;
+}
+
+int HuffmanTree:: numNodes() {
+	return nodes.size();
+}
+
+// PUBLIC
+int HuffmanTree:: GetFrequency(char ch) {
+	if( inTree(ch) )
+		return GetFrequency( lookUp(ch)  );
+	else
+		return -1;
+}
+
+// PRIVATE
+int HuffmanTree:: GetFrequency(int i) {
+	return (nodes[i]).weight;	
+}
+
+int HuffmanTree:: lookUp(char ch) {
+	for(int i = 0; i < nodes.size(); i++) {
+		if(nodes[i].ch == ch)
+			return i;
+	}
+	return -1;
+}
+
+// PUBLIC
+string HuffmanTree:: GetCode(char ch) {
+	return GetCode(lookUp(ch));
+}
+
+// PRIVATE
+string HuffmanTree:: GetCode(int i) {
+	if(nodes[i].parent == 0)
+		return "";
+	else
+		return (GetCode(nodes[i].parent) + 
+				(char) (nodes[i].childType+'0'));
+}
+
+// returns the header information for the file
+string HuffmanTree:: getHeader() {
+	ostringstream s;
+	s << numChars << endl;
+	for(int i = 0; i < nodes.size(); i++) {
+		if(nodes[i].ch != '\0')
+			s << int(nodes[i].ch) << " " << GetCode(nodes[i].ch) << endl;
+	}	
+	string outString(s.str());
+	return outString;
+}
+
+void HuffmanTree:: PrintTable() {
+	int t = 1;
+	cout << "\t\t-++++- ENCODING TABLE -++++-" << endl;
+	cout << "\tIndex\tChar\tWeight\tParent\tChildType" << endl;
+	for(int i = 0; i < nodes.size(); i++) {
+		cout << "\t" << i << "\t";
+
+		if(nodes[i].ch == ' ')
+			cout << "sp";
+		else if(nodes[i].ch == '\n')
+			cout << "nl";
+		else if(nodes[i].ch == '\0') {
+			cout << "T" << t;
+			t++;
+		}
+		else
+			cout << nodes[i].ch;
+	
+		cout << "\t" << nodes[i].weight << "\t" << nodes[i].parent << "\t";
+		if(nodes[i].childType != -1)
+			cout << nodes[i].childType << endl;
+		else
+			cout << "N/A" << endl;
+	}
+
+}
+
+void HuffmanTree:: build() {
+	// Makes a Huffman Tree out of the HNodes. Assigns each child node to a parent
+	// and combines nodes of lowest frequency until only a single node remains
+
+	for(int i = 0; i < (numChars-1); i++) {
+		int leastweight1index;
+		int leastweight1 = INT_MAX;
+		int leastweight2index;
+		int leastweight2 = INT_MAX;
+
+		for(int j = 0; j < nodes.size(); j++) {
+			if(nodes[j].parent == -1) {
+				if(nodes[j].weight < leastweight1) {
+					leastweight1 = nodes[j].weight;
+					leastweight1index = j; 
+				} 
+			}
+		}
+
+		for(int k = 0; k < nodes.size(); k++) {
+			if(nodes[k].parent == -1) {	
+				if((nodes[k].weight < leastweight2)&&(k!=leastweight1index)) {
+					leastweight2 = nodes[k].weight;
+					leastweight2index = k;
+				}
+			}
+		}
+
+		nodes[leastweight1index].parent = nodes.size();
+		nodes[leastweight2index].parent = nodes.size(); 
+
+		nodes[leastweight1index].childType = 0; 
+		nodes[leastweight2index].childType = 1; 
+
+		HNode newNode = {'\0', leastweight1 + leastweight2, -1, -1}; 
+		nodes.push_back(newNode); 
+	}
+	nodes[nodes.size()-1].parent = 0;
+	built = true;
+}
+]0;lee_c@cobra:~/csc245/Project3[lee_c@cobra Project3]$ c++ zip.cpp huffman.o
+]0;lee_c@cobra:~/csc245/Project3[lee_c@cobra Project3]$ mv a.out myZip 
+]0;lee_c@cobra:~/csc245/Project3[lee_c@cobra Project3]$ mv [K[K[Kc++ z[Kuz[Knzip.cpp 
+]0;lee_c@cobra:~/csc245/Project3[lee_c@cobra Project3]$ mv a.out myUnzip 
+]0;lee_c@cobra:~/csc245/Project3[lee_c@cobra Project3]$ ls
+[0m[01;31mbooToYou.zip[0m  huffman.cpp  huffman.o    [01;32mmyUnzip[0m  README   sample2      sample3  sample5      sample6     [01;32mUNZIP[0m      [01;32mZIP[0m
+help          huffman.h    letters.cpp  [01;32mmyZip[0m    sample1  [01;31msample2.zip[0m  sample4  [01;31msample5.zip[0m  typescript  unzip.cpp  zip.cpp
+[m]0;lee_c@cobra:~/csc245/Project3[lee_c@cobra Project3]$ z[Kzip[K[K[KmyZip --help
+Usage: ZIP [FILE]... [OPTION]
+Compress a text file using Huffman encoding.
+--t: Display the Huffman encoding table.
+--help: Provide help on command.
+]0;lee_c@cobra:~/csc245/Project3[lee_c@cobra Project3]$ myZip sample1 --t
+File sucessfully compressed to 146 bits (68.5345% Less)
+		-++++- ENCODING TABLE -++++-
+	Index	Char	Weight	Parent	ChildType
+	0	nl	1	7	0
+	1	sp	13	10	1
+	2	a	10	9	1
+	3	e	15	11	0
+	4	i	12	10	0
+	5	s	3	7	1
+	6	t	4	8	0
+	7	T1	4	8	1
+	8	T2	8	9	0
+	9	T3	18	11	1
+	10	T4	25	12	0
+	11	T5	33	12	1
+	12	T6	58	0	N/A
+]0;lee_c@cobra:~/csc245/Project3[lee_c@cobra Project3]$ myUnzip sample1.zip 
+File successfully uncompressed.
+]0;lee_c@cobra:~/csc245/Project3[lee_c@cobra Project3]$ myUnzip memes memes mes[Kmes
+Invalid arguements.
+]0;lee_c@cobra:~/csc245/Project3[lee_c@cobra Project3]$ myZip 
+Missing target file.
+]0;lee_c@cobra:~/csc245/Project3[lee_c@cobra Project3]$ exiot[K[Kt
+exit
+
+Script done on Fri 10 Nov 2017 03:49:03 AM EST

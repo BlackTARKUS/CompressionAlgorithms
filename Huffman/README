@@ -1,0 +1,23 @@
+ZIP & UNZIP = non-binary, standard compression & uncompression
+              minimum program requirements
+
+The Huffman class institutes the greedy Huffman algorithm in order to losslessly
+compress the selected text file into a compressed ZIP file. The algorithm does
+this by building a tree structure utilizing the Encoding Table. The frequency
+at which the character occurs, also known as its "weight", is used to place the
+characters within the tree structure. This structure provides a unique 
+representation of the data, which can be then used to convert that data into a
+binary representation. This results in a new binary (or compressed plain text)
+file that can then be unziped in order to regain the original data.
+The ZIP executable's code utilizes the Huffman algorithm in order to convert the
+selected text file into a compressed ZIP file. The existing text file is then
+deleted and the newly compressed ZIP file is saved onto the disk.
+The UNZIP executible's code utilizes a Map that associates the binary
+representations of character ASCII codes in order to convert the binary back
+into a proper text file. The corresponding ZIP file is then deleted and the
+newly uncompressed text file is saved onto the disk.
+
+
+c++ -c huffman.cpp
+c++ zip.cpp huffman.o
+c++ unzip.cpp
