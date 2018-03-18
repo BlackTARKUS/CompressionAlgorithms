@@ -29,13 +29,5 @@ Adaptive Huffman Coding:
 *Shannon-Fano Coding:*
   Shannon-Fano Coding is... TODO: WRITE ME (Shannon-Fano Coding Analysis)
  
-*Lempel-Ziv-Welch*
-  Lempel-Ziv-Welch is... TODO: WRITE ME (Lempel-Ziv-Welch Analysis)
- 
-
-**Implementation:**
-The source code for the implementations of the algorithms go here
-
-
-**Comparison:**
-DATA TABLES AND NUMBER CRUNCHING GO HERE
+*Lempel-Ziv-Welch:*
+  Lempel-Ziv-Welch is an umbrella of compression tehcniques which can be applied in various situations. The most well known subset of LZW compression is LZ77 compression. LZ77 can be applied to text strings in order to create a compressed string of data. LZ77 acts as if it creates a dictionary without actually using a dictionary for storing and looking up phrases. The algorithm uses pointers to refer to phrases that have previously occured within the text string, as well as the relative "jump" back to the first instance in which that phrase appeared, and how long the phrase was when it first appeared. For instance, if a string reads "a computerphile is a person who likes computers" then the LZ77 algorithm could replace the 8 bytes needed to store "computer" with a 2 bit pointer which refers to the "computer" portion of "computerphile". As such, subsets of larger phrases are used as dictionaries from which smaller phrases are pulled.
