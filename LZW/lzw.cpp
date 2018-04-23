@@ -3,6 +3,9 @@
 #include <iostream>
 #include <iterator>
 #include <vector>
+#include <fstream>
+#include <cstdlib>
+#include <sstream>
 
 using namespace std;
  
@@ -77,6 +80,8 @@ int main(int argc, char* argv[]) {
   }
   else if(argc == 2) {
     string tmp = argv[1];
+
+    // Simple error handling
     if(tmp == "--help") {
       cout << "Usage: \"compress [FILE]\" or \"uncompress [FILE]\"" << endl;
       cout << "Compress a text file using LZW encoding." << endl;
@@ -88,13 +93,87 @@ int main(int argc, char* argv[]) {
     }
   }
   else if(argc == 3) {
+    string tmp = argv[1];
     if(tmp == "compress") {
+      string contents;
       string directory = argv[2];
+      if(directory.substr(directory.size()-4) == ".zip") {
+        cout << "invalid file type. Must not be a compressed archive." << endl;
+        exit(1);
+      }
 
+      // reads in the contents of the file
+      string line;
+      ifstream infile(directory.c_str());
+      if(infile.is_open()) {
+        while(getline(infile, line)) {
+          contents.append(line);
+        }
+        infile.close();
+      }
+
+      // compresses the contents of the file into a vector of ints representing
+      // the encoded pointers of the data
+      vector<int> compressed;
+      compress(contents, std::back_inserter(compressed));
+
+      // writes the compressed data to a file on disk using CSV.
+      directory = directory.substr(0, directory.size()-4);
+      directory.append(".zip");
+      ofstream outfile(directory.c_str());
+      if(outfile.is_open()) {
+        for(int i = 0; i < compressed.size(); i++) {
+          outfile << compressed[i];
+          if(i < compressed.size()-1) {
+            outfile << ",";
+          }
+        }
+      outfile.close();
+      }
+      cout << "compression complete" << endl; 
     }
     else if(tmp == "uncompress") {
       string directory = argv[2];
+      if(directory.substr(directory.size()-4) != ".zip") {
+        cout << "invalid file type. Must be of type .zip" << endl;
+        exit(1);
+      }
 
+      // Reads in the contents of the .zip file and builds a vector.
+      string contents;
+      string line;
+      ifstream infile(directory.c_str());
+      if(infile.is_open()) {
+        while(getline(infile, line)) {
+          contents.append(line);
+        }
+        infile.close();
+      }
+      stringstream ss(contents);
+      vector<int> compressed;
+      int j;
+      while(ss >> j) {
+        compressed.push_back(j);
+
+        if(ss.peek() == ',') {
+          ss.ignore();
+        }
+      }
+
+      // Performs the decompression algorithm on the newly built vector
+      // outputs the decompressed data to a string
+      string decompressed = decompress(compressed.begin(), compressed.end());
+      
+      // Outputs the uncompressed data to a .txt file of the same name as the
+      // archive. Writes the uncompressed data to disk.
+      directory = directory.substr(0, directory.length()-4);
+      directory = directory.append(".txt");
+      ofstream outfile(directory.c_str());
+      if(outfile.is_open()) {
+        outfile << decompressed;
+      }
+      outfile.close();
+      cout << "decompression complete" << endl;
     }
     else {
       cout << "Invalid operation." << endl;
@@ -105,13 +184,6 @@ int main(int argc, char* argv[]) {
     cout << "Invalid operation." << endl;
     exit(1);
   }
-
-  vector<int> compressed;
-  compress("TOBEORNOTTOBEORTOBEORNOT", std::back_inserter(compressed));
-  copy(compressed.begin(), compressed.end(), std::ostream_iterator<int>(cout, ", "));
-  cout << endl;
-  string decompressed = decompress(compressed.begin(), compressed.end());
-  cout << decompressed << endl;
  
   return 0;
 }
