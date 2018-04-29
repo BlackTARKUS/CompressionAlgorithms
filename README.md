@@ -32,14 +32,14 @@ in LZW each byte is read only once, and the complexity of operation for each cha
 
 **LZW Coding Runtimes**
 | Sample | Characters | Runtime |
-|--|--| --|
+|--------|------------|---------|
 | 1 | 37 | 0.004s |
 | 2 | 620 | 0.006s |
 | 3 | 1381 | 0.008s |
 
 **Huffman Coding Runtimes**
 | Sample | Characters | Runtime |
-|--|--|--|
+|--------|------------|---------|
 | 1 | 37 | 0.007s |
 | 2 | 620 | 0.008s |
 | 3 | 1381 | 0.009s |
