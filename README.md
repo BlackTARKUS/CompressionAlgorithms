@@ -5,7 +5,7 @@ for CSC 499
 
 **Algorithms:** Lempel-Ziv-Welch (LZW) Coding,  Huffman Coding, and Adaptive Huffman Coding
 
-Project Breakdown: This project will describe and exemplify key concepts in computer encoding using LZW, Huffman coding, and Adaptive Huffman Coding. The key components this project will focus on are the theory and the implementation of specifically LZW and Huffman Coding. For the sake of focus and simplicity, all theory in this project will refer to encoding performed on standard ASCII based text strings, and not multi-media files. All code is implemented in C++ which is compiled on a Linux server using a modified compiler made by Dr. Pounds of Mercer University for educational purposes.
+**Project Breakdown**: This project will describe and exemplify key concepts in computer encoding using LZW, Huffman coding, and Adaptive Huffman Coding. The key components this project will focus on are the theory and the implementation of specifically LZW and Huffman Coding. For the sake of focus and simplicity, all theory in this project will refer to encoding performed on standard ASCII based text strings, and not multi-media files. All code is implemented in C++ which is compiled on a Linux server using a modified compiler made by Dr. Pounds of Mercer University for educational purposes.
 
 **Documentation:**
 
