@@ -54,10 +54,14 @@ The implementations for this project are found within the data files of the GitH
 
 # Sources
 Geek For Geeks: https://www.geeksforgeeks.org/greedy-algorithms-set-3-huffman-coding/
+
 Google Code Guide: https://sites.google.com/site/datacompressionguide/lzw
+
 Donald E Knuth, Dynamic Huffman Coding: https://www.sciencedirect.com/science/article/pii/0196677485900367
+
 Mamta Sharma, Compression Using Huffman Coding: https://pdfs.semanticscholar.org/89c2/03919ce446762d9b768ac0974f54021f338e.pdf
- Computerphile, Elegant Compression in Text: https://www.youtube.com/watch?v=goOa3DGezUA
+
+Computerphile, Elegant Compression in Text: https://www.youtube.com/watch?v=goOa3DGezUA
  
 
 # Sample Data Used
