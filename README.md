@@ -31,6 +31,7 @@ On average Huffman encoding requires O(N) for time complexity and O(LogK) for sp
 in LZW each byte is read only once, and the complexity of operation for each character is constant, and as such, the complexity is O(n)
 
 **LZW Coding Runtimes**
+
 | Sample | Characters | Runtime |
 |--------|------------|---------|
 | 1 | 37 | 0.004s |
@@ -38,11 +39,18 @@ in LZW each byte is read only once, and the complexity of operation for each cha
 | 3 | 1381 | 0.008s |
 
 **Huffman Coding Runtimes**
+
 | Sample | Characters | Runtime |
 |--------|------------|---------|
 | 1 | 37 | 0.007s |
 | 2 | 620 | 0.008s |
 | 3 | 1381 | 0.009s |
+
+
+| First Header  | Second Header |
+| ------------- | ------------- |
+| Content Cell  | Content Cell  |
+| Content Cell  | Content Cell  |
 
 # Conclusion
 Both Huffman and LZW are powerful and useful compression algorithms which continue to be used in the modern environment despite their age. Huffman, due to its greedy nature, is primarily used in older mainstream media compression. This includes Winzip, Gzip, Bzip2, and JPEG (image) applications. Although Huffman is eclipsed by some modern proprietary arithmetic and range based coding solutions, Huffman remains a commonly used standard. LZW is similarly used in lossless data files. Most commonly LZW is found in GIF and TIFF media formats, as well as in Modem compression (wireless internet data transfer). The low system requirements of LZW makes it an ideal encoding and decoding technique for machines which lack large amounts of innate processing power, or when the allocated resources to the encoding and decoding are limited (such as in web applications). LZW is a popular choice because of its unique ability to handle a large variety of data with similar results, and as such remains a popular choice in modern computing. 
